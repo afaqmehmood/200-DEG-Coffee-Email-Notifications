@@ -1,36 +1,118 @@
+{% capture email_title %}Your shipping status has been updated{% endcapture %}
+{% capture email_body %}The following items have been updated with new shipping information.{% endcapture %}
+  {%- capture contact_details -%}
+    If you have any questions about your order, please contact <a href="mailto:contact@200degrees.co.uk">contact@200degrees.co.uk</a>
+  {%- endcapture -%}
+  {%- capture copyright_text -%}
+    Copyright © 200° Coffee 2024<br>
+    200° Coffee Roasters, Heston House, Meadow Lane, Nottingham, NG2 3HE
+  {%- endcapture -%}
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Your Order is Out for Delivery</title>
+  <title>{{ email_title }}</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" type="text/css" href="/assets/notifications/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 0;
       background-color: #000;
       color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: Georgia, sans-serif;
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    strong {
+      color: #E1DDDC;
+    }
+
+    h1, h2, h3 {
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+      text-transform: uppercase;
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -1px;
+      color: #E1DDDC;
     }
     a {
-      color: #e9204f;
-      text-decoration: none;
+      color: #CB0826;
+      text-decoration: underline;
     }
     .container {
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
       margin: 0 auto;
-      background-color: #111;
+      background-color: #000;
+      overflow: hidden;
+    }
+    .header-container {
+      padding-left: 20px;
+      padding-top: 20px;
     }
     .header {
-      background-color: #000;
-      padding: 20px;
-      text-align: center;
+      width: 100%;
+      margin-left: 0px;
+      margin-top: 0;
+    }
+    .header tbody {
+      text-align: left;
+      width: 100%;
+    }
+
+    .header .logo {
+      width: 165px;
+      height: auto;
+      margin-right: 45px;
+      text-align: left;
+    }
+
+    .header .logo img {
+      width: 100%;
+      min-width: 90px;
+      max-width: 120px;
+      object-fit: cover;
     }
     .nav {
-      background-color: #e9204f;
-      text-align: center;
+      text-align: right;
       padding: 10px 0;
+      vertical-align: bottom;
     }
+
+    .nav .nav-list {
+      background-color: #e9204f;
+      border-top-left-radius: 48px;
+      border-bottom-left-radius: 48px;
+    }
+    .nav .nav-list td {
+      padding: 14px 21px;
+      font-family: Oswald, sans-serif;
+      font-optical-sizing: auto;
+      font-weight: 600;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      white-space: nowrap;
+    }
+    .nav .nav-list td a {
+      margin: 0;
+      display: inline;
+      text-decoration: none;
+    }
+
+    .nav .nav-list td:first-child {
+      padding-left: 32px;
+    }
+
+    .nav .nav-list td:last-child {
+      padding-right: 20px;
+    } 
     .nav a {
       color: #fff;
       margin: 0 10px;
@@ -40,141 +122,489 @@
     }
     .hero {
       padding: 30px 20px 10px;
-      text-align: center;
+      text-align: left;
     }
     .hero h1 {
-      font-size: 22px;
+      font-size: 49px;
       font-weight: bold;
+      margin-bottom: 24px;
+    }
+    .hero hr {
+      color: #343631;
+      background-color: #343631;
+      border-color: #343631;
+      margin: 3px 0
+    }
+    .hero .body {
+      color: #fff;
+      margin: 25px 0;
     }
     .order-link {
       font-size: 13px;
       margin: 5px 0;
+      margin-top: 40px;
     }
     .view-order-btn {
       display: inline-block;
       margin-top: 10px;
-      padding: 12px 24px;
-      background-color: #fff;
-      color: #000;
-      font-weight: bold;
-      border-radius: 4px;
+      margin-bottom: 33px;
+      padding: 15px 51px;
+      background-color: #000;
+      color: #fff;
+      border: 1px solid #fff;
+      font-weight: 400;
+      font-size: 16px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      text-decoration: none;
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     }
     .summary {
       background-color: #1a1a1a;
       padding: 20px;
     }
     .summary h2 {
-      font-size: 16px;
-      border-bottom: 1px solid #333;
+      font-size: 28px;
+      /* border-bottom: 1px solid #333; */
       padding-bottom: 10px;
-    }
-    .item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #333;
-    }
-    .item img {
-      max-width: 60px;
-      margin-right: 15px;
-    }
-    .item-info {
-      flex: 1;
-      font-size: 14px;
-    }
-    .footer {
-      background-color: #000;
-      padding: 20px;
-      text-align: center;
-      font-size: 12px;
-    }
-    .footer a {
-      color: #e9204f;
-    }
-    .social-icons img {
-      width: 24px;
-      margin: 0 5px;
+      letter-spacing: -1px;
+      line-height: 61px;
+      padding-bottom: 24px;
+      margin-bottom: 0;
     }
 
-    @media only screen and (max-width: 600px) {
-      .item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .item img {
-        margin-bottom: 10px;
-      }
+    .summary hr {
+      color: #343631;
+      background: #343631;
+      border-color: #343631;
+      margin: 2px 0;
     }
+
+    .summary table {
+      width: 100%;
+    }
+    
+    .summary table .item {
+    }
+    .summary table .cell {
+      text-align: left;
+      vertical-align: top;
+      padding-top: 40px;
+      padding-bottom: 30px;
+      color: #fff;
+    }
+
+    .order-list__item-quantity, .order-list__item-pricing {
+      text-transform: uppercase;
+    }
+
+    .order-list__image-cell {
+      width: 84px;
+    }
+
+    .item {
+      border-bottom: 1px solid #E1DDDC;
+    }
+    .order-list__image-cell img {
+      max-width: 84px;
+      width: 100%;
+      height: auto;
+    }
+    .item-info {
+      font-size: 14px;
+      color: #E1DDDC;
+      padding-left: 10px
+    }
+
+    .item-info * {
+      color: #E1DDDC;
+    }
+
+    .item-info .item-title {
+      font-size: 16px;
+      line-height: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      margin-bottom: 14px;
+      display: inline-block;
+    }
+
+    .pre-footer {
+      margin-top: 40px;
+      padding:0 26px;
+      margin-bottom: 70px;
+    }
+
+    .pre-footer p {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 400;
+    }
+    .footer {
+      background-image: url(https://cdn.shopify.com/s/files/1/0961/1368/8840/files/Isolation_Mode.png);
+      background-position: left;
+      background-repeat: no-repeat;
+      background-color: #000;
+      padding: 20px;
+      text-align: left;
+      font-size: 12px;
+      border: none;
+      min-height: 400px;
+      display: table;
+      width: 100%;
+      padding-bottom: 30px;
+      border-bottom: 1px solid #E1DDDC;
+    }
+
+    .footer .footer-logo, .footer .social-icons, .footer .footer-menu {
+      /* display: inline-block; */
+      display: table-cell;
+      height: 100%;
+      vertical-align: middle;
+    }
+
+    .footer .footer-logo {
+      width: 120px;
+    }
+    .footer .social-icons {
+      padding-left: 50px;
+    }
+    .footer .social-icons a {
+      display: block;
+    }
+    .footer .social-icons a:not(:last-child) {
+      margin-bottom: 24px;
+    }
+
+    .footer .footer-menu {
+      margin-left: auto;
+    }
+
+    .footer .footer-menu ul {
+      list-style: none;
+    }
+
+    .footer .footer-menu ul li:not(:last-child) {
+      margin-bottom: 24px
+    }
+    .footer a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .footer-copyright p {
+      text-align: center;
+      color: #fff;
+      padding-top: 22px;
+      margin-bottom: 34px;
+    }
+
   </style>
 </head>
 <body>
   <div class="container">
 
     <!-- Header -->
-    <div class="header">
-      <img src="https://yourdomain.com/logo.png" alt="200 Degrees Coffee" style="width:100px;">
-    </div>
+     <div class="header-container">
+       <table class="header">
+         <tbody>
+           <tr>
+             <td class="logo">
+               {%- if shop.email_logo_url %}
+                 <img src="{{shop.email_logo_url}}" alt="{{ shop.name }}" width="{{ shop.email_logo_width }}">
+               {%- else %}
+                 <h1 class="shop-name__text">
+                   <a href="{{shop.url}}">{{ shop.name }}</a>
+                 </h1>
+               {%- endif %}
+             </td>
+             <!-- Nav -->
+             <td class="nav">
+               <table class="nav-list">
+                 <tr>
+                  <!-- Coffee Shops -->
+                  <td width="130" align="center" style="padding: 14px 21px;">
+                    <a href="#" style="display: block; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-decoration: none;">
+                      Coffee Shops
+                    </a>
+                  </td>
+                  <!-- Barista Schools -->
+                  <td width="150" align="center" style="padding: 14px 21px;">
+                    <a href="#" style="display: block; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-decoration: none;">
+                      Barista Schools
+                    </a>
+                  </td>
+                  <!-- Subscriptions -->
+                  <td width="160" align="center" style="padding: 14px 21px;">
+                    <a href="#" style="display: block; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-decoration: none;">
+                      Subscriptions
+                    </a>
+                  </td>
+                  <!-- Wholesale -->
+                  <td width="120" align="center" style="padding: 14px 21px;">
+                    <a href="#" style="display: block; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-decoration: none;">
+                      Wholesale
+                    </a>
+                  </td>
+                 </tr>
+               </table>
+             </td>
+           </tr>
+         </tbody>
+       </table>
+     </div>
 
-    <!-- Nav -->
-    <div class="nav">
-      <a href="#">Coffee Shops</a>
-      <a href="#">Barista Schools</a>
-      <a href="#">Subscriptions</a>
-      <a href="#">Wholesale</a>
-    </div>
 
     <!-- Hero Section -->
     <div class="hero">
-      <h1>YOUR ORDER IS OUT FOR DELIVERY</h1>
+      <h1>{{ email_title }}</h1>
+      <hr>
+      <hr>
       <div class="order-link">
-        Order No. <a href="#">#123456789</a>
+        <a href="{{ order_status_url }}">Order No. {{ order_name }}</a>
+        {%- if po_number %}
+        <span class="po-number__text">
+          PO number. {{ po_number }}
+        </span>
+      {%- endif %}
       </div>
-      <p style="font-size: 13px; line-height: 1.5;">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      <p class="body" style="font-size: 13px; line-height: 1.5;">
+        {{ email_body }}
       </p>
-      <a href="#" class="view-order-btn">VIEW ORDER</a>
+      <a href="{{ order_status_url }}" target="_blank" class="view-order-btn">VIEW ORDER &nbsp;&nbsp;<span class="icon-arrow"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/Component_1.png?v=1747601760" width="16" height="16"></span></a>
     </div>
 
     <!-- Order Summary -->
     <div class="summary">
       <h2>ORDER SUMMARY</h2>
-
-      <!-- Item 1 -->
-      <div class="item">
-        <img src="https://yourdomain.com/coffee.jpg" alt="Brazilian Love Affair">
-        <div class="item-info">
-          <strong>BRAZILIAN LOVE AFFAIR</strong><br>
-          Whole Bean - 250g - Qty: 1<br>
-          £8.75
-        </div>
-      </div>
-
-      <!-- Item 2 -->
-      <div class="item">
-        <img src="https://yourdomain.com/kettle.jpg" alt="Hario Buono Water Kettle">
-        <div class="item-info">
-          <strong>HARIO BUONO WATER KETTLE</strong><br>
-          Qty: 1<br>
-          £60.00
-        </div>
-      </div>
-
+      <hr>
+      <hr>
+      <table>
+        <tbody>
+          {% for line in fulfillment.fulfillment_line_items %}
+          <!-- Item {{ forloop.index }} -->
+          <tr class="item">
+            {% assign expand_bundles = false %}
+            {% if expand_bundles and line.line_item.bundle_parent? %}
+              <td class="order-list__parent-image-cell cell">
+                {% if line.line_item.image %}
+                  <img 
+                    src="{{ line.line_item | img_url: 'compact_cropped' }}" 
+                    align="left"
+                    width="60"
+                    height="60"
+                  >
+                  {% else %}
+                  <img
+                    src="{{ 'notifications/no-image.png' | shopify_asset_url }}"
+                    align="left"
+                    width="60"
+                    height="60"
+                  >
+                {% endif %}
+              </td>
+            {% else %}
+              <td class="order-list__image-cell cell">
+                {% if line.line_item.image %}
+                  <img 
+                    src="{{ line.line_item | img_url: 'compact_cropped' }}" 
+                    align="left"
+                    width="60"
+                    height="60"
+                  >
+                  {% else %}
+                  <img
+                    src="{{ 'notifications/no-image.png' | shopify_asset_url }}"
+                    align="left"
+                    width="60"
+                    height="60"
+                  >
+                {% endif %}
+              </td>
+            {% endif %}
+            <td class="item-info cell">
+              {% if line.line_item.product.title %}
+                {% assign line_title = line.line_item.product.title %}
+              {% else %}
+                {% assign line_title = line.line_item.title %}
+              {% endif %}
+  
+              
+  
+              <strong class="item-title">{{- line_title }}</strong><br>
+              {% if line.line_item.variant.title != 'Default Title'
+                and line.line_item.bundle_parent? == false
+              %}
+                {% if line.line_item.variant.title %}
+                <span class="order-list__item-variant">{{ line.line_item.variant.title }}</span><br>
+                {% endif %}
+              {% elsif line.line_item.variant.title != 'Default Title'
+                and line.line_item.bundle_parent?
+                and expand_bundles == false
+              %}
+              {% if line.line_item.variant.title %}
+                <span class="order-list__item-variant">{{ line.line_item.variant.title }}</span><br>
+                {% endif %}
+              {% endif %}
+              {% if expand_bundles %}
+                {% for component in line.line_item.bundle_components %}
+                    <div class="order-list__item">
+                      <div class="order-list__bundle-item">
+                        <div class="order-list__image-cell">
+                          {% if component.image %}
+                            <img
+                              src="{{ component | img_url: 'compact_cropped' }}"
+                              align="left"
+                              width="40"
+                              height="40"
+                              class="order-list__product-image small"
+                            >
+                          {% else %}
+                            <div class="order-list__no-image-cell small">
+                              <img
+                                src="{{ 'notifications/no-image.png' | shopify_asset_url }}"
+                                align="left"
+                                width="40"
+                                height="40"
+                                class="order-list__no-product-image small"
+                              >
+                            </div>
+                          {% endif %}
+                        </div>
+  
+                        <div class="order-list__product-description-cell">
+                          {% if component.product.title %}
+                            {% assign component_title = component.product.title %}
+                          {% else %}
+                            {% assign component_title = component.title %}
+                          {% endif %}
+  
+                          {% assign component_display = component.quantity %}
+  
+                          <span class="order-list__item-title">
+                            {{- component_display }}&nbsp;&times;&nbsp;
+                            {{- component_title -}}</span
+                          ><br>
+  
+                          {% if component.variant.title != 'Default Title' %}
+                            <span class="order-list__item-variant">
+                              {{- component.variant.title -}}
+                            </span>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                {% endfor %}
+              {% else %}
+                {% for group in line.line_item.groups %}
+                  <span class="order-list__item-variant">Part of: {{ group.display_title }}</span
+                  ><br>
+                {% endfor %}
+              {% endif %}
+  
+              {% if line.line_item.selling_plan_allocation %}
+                <span class="order-list__item-variant">
+                  {{- line.line_item.selling_plan_allocation.selling_plan.name -}}</span
+                ><br>
+              {% endif %}
+  
+              {% if line.line_item.refunded_quantity > 0 %}
+                {% assign current_quantity = line.line_item.quantity %}
+                {% assign refunded_quantity = line.line_item.refunded_quantity %}
+                <span class="order-list__item-refunded">
+                  {{ refunded_quantity }} of
+                  {{ current_quantity | plus: refunded_quantity }} Refunded</span
+                >
+              {% endif %}
+  
+              {% if line.line_item.discount_allocations %}
+                {% for discount_allocation in line.line_item.discount_allocations %}
+                  {% if discount_allocation.discount_application.target_selection != 'all' %}
+                    <p>
+                      <span class="order-list__item-discount-allocation">
+                        <img
+                          src="{{ 'notifications/discounttag.png' | shopify_asset_url }}"
+                          width="18"
+                          height="18"
+                          class="discount-tag-icon"
+                        >
+                        <span>
+                          {{ discount_allocation.discount_application.title | upcase }}
+                          (-{{ discount_allocation.amount | money }})
+                        </span>
+                      </span>
+                    </p>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </td>
+            <td class="order-list__item-quantity cell">
+              {% if line.quantity < line.line_item.quantity %}
+                {% capture line_display %}
+                  {{ line.quantity }} of {{ line.line_item.quantity }}
+                {% endcapture %}
+              {% else %}
+                {% assign line_display = line.line_item.quantity %}
+              {% endif %}
+              Qty:{{ line_display }}
+            </td>
+            <td class="order-list__item-pricing cell">
+              {% if line.final_line_price > 0 %}
+                {{ line.final_line_price | money }}
+                
+              {% else %}
+                Free
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
+    <div class="pre-footer">
+      <p class="contact" style="padding-left: 6px">{{ contact_details }}</p>
+    </div>
     <!-- Footer -->
     <div class="footer">
-      <p>If you have any questions about your order, please contact <a href="mailto:contact@200degrees.co.uk">contact@200degrees.co.uk</a></p>
-      <div class="social-icons">
-        <a href="#"><img src="https://yourdomain.com/icon-instagram.png" alt="Instagram"></a>
-        <a href="#"><img src="https://yourdomain.com/icon-facebook.png" alt="Facebook"></a>
-        <a href="#"><img src="https://yourdomain.com/icon-twitter.png" alt="Twitter"></a>
+      <div class="footer-logo">
+        {%- if shop.email_logo_url %}
+          <img src="{{shop.email_logo_url}}" alt="{{ shop.name }}" width="120">
+        {%- else %}
+          <h1 class="shop-name__text">
+            <a href="{{shop.url}}">{{ shop.name }}</a>
+          </h1>
+        {%- endif %}
       </div>
-      <p style="margin-top: 10px;">
-        Coffee Shops | Barista Schools | Subscriptions | Wholesale<br>
-        &copy; 200° Coffee Roasters, 2025
-      </p>
+      <div class="social-icons">
+        <a href="#"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/INsta.png?v=1747573883" width="47px" height="47px" alt="Instagram"></a>
+        <a href="#"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/Linkd.png?v=1747573884" width="47px" height="47px" alt="LinkedIn"></a>
+        <a href="#"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/Face.png?v=1747573883" width="47px" height="47px" alt="Facebook"></a>
+      </div>
+      <div class="footer-menu">
+        <ul class="menu-list">
+          <li class="menu-item">
+            <a href="#">Coffee Shops</a>
+          </li>
+          <li class="menu-item">
+            <a href="#">Barista Schools</a>
+          </li>
+          <li class="menu-item">
+            <a href="#">Subscriptions</a>
+          </li>
+          <li class="menu-item">
+            <a href="#">Wholesale</a>
+          </li>
+        </ul>
+      </div>
     </div>
+
+    <!-- Copyright -->
+     <div class="footer-copyright">
+      <p style="margin-top: 10px;">
+        {{ copyright_text }}
+      </p> 
+     </div>
 
   </div>
 </body>
