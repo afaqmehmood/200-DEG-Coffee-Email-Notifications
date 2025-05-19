@@ -1,5 +1,24 @@
-{% capture email_title %}Your shipping status has been updated{% endcapture %}
-{% capture email_body %}The following items have been updated with new shipping information.{% endcapture %}
+{% if fulfillment.item_count == item_count %} 
+  {% capture email_title %}Your order is on the way{% endcapture %}
+  {% capture email_body %}Your order is on the way. Track your shipment to see the delivery status.{% endcapture %}
+{% elsif fulfillment.item_count > 1 %} 
+  {% if fulfillment_status == 'fulfilled' %}
+    {% capture email_title %}The last items in your order are on the way{% endcapture %}
+    {% capture email_body %}The last items in your order are on the way. Track your shipment to see the delivery status.{% endcapture %}
+  {% else %}
+    {% capture email_title %}Some items in your order are on the way{% endcapture %}
+    {% capture email_body %}Some items in your order are on the way. Track your shipment to see the delivery status.{% endcapture %}
+  {% endif %}
+{% else %} 
+  {% if fulfillment_status == 'fulfilled' %}
+    {% capture email_title %}The last item in your order is on the way{% endcapture %}
+    {% capture email_body %}The last item in your order is on the way. Track your shipment to see the delivery status.{% endcapture %}
+  {% else %}
+    {% capture email_title %}One item in your order is on the way{% endcapture %}
+    {% capture email_body %}One item in your order is on the way. Track your shipment to see the delivery status.{% endcapture %}
+  {% endif %}
+{% endif %}
+
 {%- capture contact_details -%}
   If you have any questions about your order, please contact <a href="mailto:contact@200degrees.co.uk">contact@200degrees.co.uk</a>
 {%- endcapture -%}
@@ -7,8 +26,10 @@
   Copyright © 200° Coffee 2024<br>
   200° Coffee Roasters, Heston House, Meadow Lane, Nottingham, NG2 3HE
 {%- endcapture -%}
+
+{% capture email_emphasis %}Estimated delivery date: <strong>{{fulfillment.estimated_delivery_at | date: format: 'date'}}</strong>{% endcapture %}
+
 <!DOCTYPE html>
-<html>
 <head>
   <meta charset="UTF-8">
   <title>{{ email_title }}</title>
@@ -91,13 +112,13 @@
       border-bottom-left-radius: 48px;
     }
     .nav .nav-list td {
-      padding: 14px 21px;
+      padding: 14px 18px;
       font-family: Oswald, sans-serif;
       font-optical-sizing: auto;
       font-weight: 600;
       font-size: 16px;
       text-transform: uppercase;
-      letter-spacing: -1px;
+      letter-spacing: -1.5px;
       white-space: nowrap;
     }
     .nav .nav-list td a {
@@ -269,10 +290,7 @@
     .footer .social-icons {
       padding-left: 50px;
     }
-    .footer .social-icons a {
-      display: block;
-    }
-    .footer .social-icons a:not(:last-child) {
+    .footer .social-icons li:not(:last-child) {
       margin-bottom: 24px;
     }
 
@@ -280,7 +298,8 @@
       margin-left: auto;
     }
 
-    .footer .footer-menu ul {
+    .footer .footer-menu ul, .footer .social-icons ul {
+      padding: 0;
       list-style: none;
     }
 
@@ -323,25 +342,25 @@
                <table class="nav-list">
                  <tr>
                   <!-- Coffee Shops -->
-                  <td width="130" align="center" style="padding: 14px 21px;">
+                  <td nowrap align="center">
                     <a href="#" style="display: block; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-decoration: none;">
-                      Coffee Shops
+                      Coffee&nbsp;Shops
                     </a>
                   </td>
                   <!-- Barista Schools -->
-                  <td width="150" align="center" style="padding: 14px 21px;">
+                  <td nowrap align="center">
                     <a href="#" style="display: block; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-decoration: none;">
-                      Barista Schools
+                      Barista&nbsp;Schools
                     </a>
                   </td>
                   <!-- Subscriptions -->
-                  <td width="160" align="center" style="padding: 14px 21px;">
+                  <td nowrap align="center">
                     <a href="#" style="display: block; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-decoration: none;">
                       Subscriptions
                     </a>
                   </td>
                   <!-- Wholesale -->
-                  <td width="120" align="center" style="padding: 14px 21px;">
+                  <td nowrap align="center">
                     <a href="#" style="display: block; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-decoration: none;">
                       Wholesale
                     </a>
@@ -362,11 +381,32 @@
       <hr>
       <div class="order-link">
         <a href="{{ order_status_url }}">Order No. {{ order_name }}</a>
-        {%- if po_number %}
-        <span class="po-number__text">
-          PO number. {{ po_number }}
-        </span>
-      {%- endif %}
+        {% if fulfillment.tracking_numbers.size > 0 %}
+          <p class="disclaimer__subtext">
+            <br>
+            {% if fulfillment.tracking_numbers.size == 1
+              and fulfillment.tracking_company
+              and fulfillment.tracking_url
+            %}
+              {{ fulfillment.tracking_company }} tracking number:
+              <a href="{{ fulfillment.tracking_url }}">{{ fulfillment.tracking_numbers.first }}</a>
+            {% elsif fulfillment.tracking_numbers.size == 1 %}
+              Tracking number: {{ fulfillment.tracking_numbers.first }}
+            {% else %}
+              {{ fulfillment.tracking_company }} tracking numbers:<br>
+              {% for tracking_number in fulfillment.tracking_numbers %}
+                {% if fulfillment.tracking_urls[forloop.index0] %}
+                  <a href="{{ fulfillment.tracking_urls[forloop.index0] }}">
+                    {{ tracking_number }}
+                  </a>
+                {% else %}
+                  {{ tracking_number }}
+                {% endif %}
+                <br>
+              {% endfor %}
+            {% endif %}
+          </p>
+        {% endif %}
       </div>
       <p class="body" style="font-size: 13px; line-height: 1.5;">
         {{ email_body }}
@@ -577,9 +617,11 @@
         {%- endif %}
       </div>
       <div class="social-icons">
-        <a href="#"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/INsta.png?v=1747573883" width="47px" height="47px" alt="Instagram"></a>
-        <a href="#"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/Linkd.png?v=1747573884" width="47px" height="47px" alt="LinkedIn"></a>
-        <a href="#"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/Face.png?v=1747573883" width="47px" height="47px" alt="Facebook"></a>
+        <ul class="icons-list">
+          <li class="icon-social"><a href="#"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/INsta.png?v=1747573883" width="47px" height="47px" alt="Instagram"></a></li>
+          <li class="icon-social"><a href="#"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/Linkd.png?v=1747573883" width="47px" height="47px" alt="Twitter"></a></li>
+          <li class="icon-social"><a href="#"><img src="https://cdn.shopify.com/s/files/1/0961/1368/8840/files/Face.png?v=1747573883" width="47px" height="47px" alt="YouTube"></a></li>
+        </ul>
       </div>
       <div class="footer-menu">
         <ul class="menu-list">
